@@ -8,17 +8,13 @@ const REMOVE_PROP = 'REMOVE PROP';
 //// DIFF
 
 function changed(node1, node2) {
-  return (
-    typeof node1 !== typeof node2 ||
-    (typeof node1 === 'string' && node1 !== node2) ||
-    node1.type !== node2.type
-  );
+  return typeof node1 !== typeof node2 || typeof node1 === 'string' && node1 !== node2 || node1.type !== node2.type;
 }
 
 function diffProps(newNode, oldNode) {
   const patches = [];
   const props = Object.assign({}, newNode.props, oldNode.props);
-  Object.keys(props).forEach((name) => {
+  Object.keys(props).forEach(name => {
     const newVal = newNode.props[name];
     const oldVal = oldNode.props[name];
     if (!newVal) {
@@ -32,10 +28,7 @@ function diffProps(newNode, oldNode) {
 
 function diffChildren(newNode, oldNode) {
   const patches = [];
-  const patchesLength = Math.max(
-    newNode.children.length,
-    oldNode.children.length,
-  );
+  const patchesLength = Math.max(newNode.children.length, oldNode.children.length);
   for (let i = 0; i < patchesLength; i++) {
     patches[i] = diff(newNode.children[i], oldNode.children[i]);
   }
@@ -56,7 +49,7 @@ function diff(newNode, oldNode) {
     return {
       type: UPDATE,
       props: diffProps(newNode, oldNode),
-      children: diffChildren(newNode, oldNode),
+      children: diffChildren(newNode, oldNode)
     };
   }
 }
@@ -81,7 +74,7 @@ function setProp(target, name, value) {
 }
 
 function setProps(target, props) {
-  Object.keys(props).forEach((name) => {
+  Object.keys(props).forEach(name => {
     setProp(target, name, props[name]);
   });
 }
@@ -112,26 +105,30 @@ function patch(parent, patches, index = 0) {
   }
   const el = parent.childNodes[index];
   switch (patches.type) {
-    case CREATE: {
-      const { newNode } = patches;
-      const newEl = createElement(newNode);
-      return parent.appendChild(newEl);
-    }
-    case REMOVE: {
-      return parent.removeChild(el);
-    }
-    case REPLACE: {
-      const { newNode } = patches;
-      const newEl = createElement(newNode);
-      return parent.replaceChild(newEl, el);
-    }
-    case UPDATE: {
-      const { children, props } = patches;
-      patchProps(el, props);
-      for (let i = 0; i < children.length; i++) {
-        patch(el, children[i], i);
+    case CREATE:
+      {
+        const { newNode } = patches;
+        const newEl = createElement(newNode);
+        return parent.appendChild(newEl);
       }
-    }
+    case REMOVE:
+      {
+        return parent.removeChild(el);
+      }
+    case REPLACE:
+      {
+        const { newNode } = patches;
+        const newEl = createElement(newNode);
+        return parent.replaceChild(newEl, el);
+      }
+    case UPDATE:
+      {
+        const { children, props } = patches;
+        patchProps(el, props);
+        for (let i = 0; i < children.length; i++) {
+          patch(el, children[i], i);
+        }
+      }
   }
 }
 
@@ -149,12 +146,15 @@ function h(type, props, ...children) {
 
 function view(count) {
   const r = [...Array(count).keys()];
-  return (
-    <ul id="list" className={`my-class=${count % 3}`}>
-      {r.map((n) => (
-        <li>item {(count * n).toString()}</li>
-      ))}
-    </ul>
+  return h(
+    'ul',
+    { id: 'list', className: `my-class=${count % 3}` },
+    r.map(n => h(
+      'li',
+      null,
+      'item ',
+      (count * n).toString()
+    ))
   );
 }
 
